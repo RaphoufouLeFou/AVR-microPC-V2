@@ -29,20 +29,26 @@ AVR_Init:
 ;   r24, DataL
 ;   r22, AddressX
 ;   r20, AddressY
+;  	Using :
+;   r23
 
 .global AVR_Output_Pixel
 AVR_Output_Pixel:                      	;output the pixel to the screen
-
-    ;sbis    _SFR_IO_ADDR(PING),   4	    ;
-	rjmp    AVR_Output_Pixel			;
-	ldi		XL,		0x62				;
-	clr		XH							;
-	st     	X,		r24					;
-    out     _SFR_IO_ADDR(PORTA),  r25	;
-	out     _SFR_IO_ADDR(PORTC),  r22   ;
-    ori     r20,                  0x01  ;
-    out     _SFR_IO_ADDR(PORTD),  r20   ;
-    cbi     _SFR_IO_ADDR(PORTD),  7     ;
+	#define   tmp r23
+	ldi		XL,		0x63				;
+	clr		XH
+AVR_Output_Pixel_Loop:
+	ld		tmp, 	X
+	sbrs    tmp,   4	    			
+	rjmp    AVR_Output_Pixel_Loop	
+		
+	ldi		XL,		0x62					
+	st     	X,		r24					
+    out     _SFR_IO_ADDR(PORTA),  r25	
+	out     _SFR_IO_ADDR(PORTC),  r22   
+    ori     r20,                  0x01  
+    out     _SFR_IO_ADDR(PORTD),  r20   
+    cbi     _SFR_IO_ADDR(PORTD),  7     
     clr     r20
 	st     	X,		r20					;Clear the ports
 	out     _SFR_IO_ADDR(PORTA),  r20   ;
@@ -69,13 +75,16 @@ AVR_Output_All:
 
     #define   AdX r25
     #define   AdY r24
+	#define   tmp r23
 
     clr    AdX
     clr    AdY
+	ldi		XL,		0x63				;
 
 outputAllLoop:
-    sbis    _SFR_IO_ADDR(PINA),   2	    ;
-	rjmp    outputAllLoop				;
+	ld		tmp, 	X
+	sbrs    tmp,   4	    			
+	rjmp    AVR_Output_Pixel_Loop	
 
     out     _SFR_IO_ADDR(PORTD),  r20   ;
     out     _SFR_IO_ADDR(PORTC),  r22   ;
