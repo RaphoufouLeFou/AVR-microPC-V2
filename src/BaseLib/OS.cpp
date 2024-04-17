@@ -1,7 +1,5 @@
-#include <Font.h>
-#include <baseLib.h>
-#include <OS.h>
-#include <stdint.h>
+#include "baseLib.h"
+#include "OS.h"
 
 void PrintText(const char *text, uint8_t x, uint8_t y, Color color){
     for (int i = 0; text[i] != '\0'; i++){
