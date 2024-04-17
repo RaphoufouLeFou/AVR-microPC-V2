@@ -19,17 +19,17 @@ public:
         this->b = b;
     }*/
     Color(float r, float g, float b){
-        this->r = (int)(r*31);
-        this->g = (int)(g*63);
-        this->b = (int)(b*31);
+        this->r = (int)(r*0b11111);
+        this->g = (int)(g*0b111111);
+        this->b = (int)(b*0b11111);
     }
     Color(uint16_t colorBGR){
         b = (colorBGR & 0b1111100000000000) >> 11;
         g = (colorBGR & 0b0000011111100000) >> 5;
-        r = (colorBGR & 0b0000000000011111);
+        r = (colorBGR & 0b0000000000011111) >> 0;
     }
     uint16_t get16BitBGR(){
-        return (b << 11) | (g << 5) | r;
+        return (b << 11) | (g << 5) | (r << 0);
     }
     uint8_t r;
     uint8_t g;
