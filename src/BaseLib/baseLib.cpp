@@ -83,5 +83,3 @@ void DrawRectangle(int x1, int y1, int x2, int y2, Color color){
 uint8_t ReadInputs(){
     return AVR_Read_Inputs();
 }
-
-
