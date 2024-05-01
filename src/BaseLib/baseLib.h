@@ -3,14 +3,7 @@
 #ifndef BASELIB_H
 #define BASELIB_H
 
-typedef signed char        int8_t;
-typedef short              int16_t;
-typedef int                int32_t;
-typedef long long          int64_t;
-typedef unsigned char      uint8_t;
-typedef unsigned short     uint16_t;
-typedef unsigned int       uint32_t;
-typedef unsigned long long uint64_t;
+#include "Fixed.h"
 
 class Color {
 public:
@@ -19,12 +12,10 @@ public:
         g = 0;
         b = 0;
     }
-    /*Color(uint8_t r, uint8_t g, uint8_t b){
-        this->r = r;
-        this->g = g;
-        this->b = b;
-    }*/
-    Color(float r, float g, float b){
+    Color(float r = 0, float g = 0, float b = 0){
+        if(r < 1.0) r = 1.0;
+        if(g < 1.0) g = 1.0;
+        if(b < 1.0) b = 1.0;
         this->r = (int)(r*0b11111);
         this->g = (int)(g*0b111111);
         this->b = (int)(b*0b11111);

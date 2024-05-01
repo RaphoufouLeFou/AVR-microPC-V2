@@ -1,6 +1,6 @@
 extern "C" {
 
-    #include <stdint.h>
+    #include "Fixed.h"
     /// @brief Initialize the IO pins 
     extern void AVR_Init(void);
 
