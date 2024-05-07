@@ -35,7 +35,7 @@ int main (int argc, char **argv) {
     Command1 = (char*)malloc(CfileNameSize * sizeof(char));
     memcpy(Command1, "avr-g++ -c ", 12 * sizeof(char));
     strcat(Command1, Optimization);
-    strcat(Command1, " -w -mmcu=ATmega128a -DF_CPU=20000000L ");
+    strcat(Command1, " -w -mmcu=ATmega128a -DF_CPU=16000000L ");
     strcat(Command1, Cfilename);
     strcat(Command1, " -o out.o");
 
@@ -50,7 +50,7 @@ int main (int argc, char **argv) {
         Command5 = "avr-size -A image.elf";
     else(ThrowException("Invalid Send Flag"));
     if(strcmp(RecompileLib, "-y") == 0){
-        system("avr-g++ -c -O3 -w -mmcu=ATmega128a -DF_CPU=20000000L BaseLib/driver.S -o BaseLib/driver.o");
+        system("avr-g++ -c -O3 -w -mmcu=ATmega128a -DF_CPU=16000000L BaseLib/driver.S -o BaseLib/driver.o");
     }else if(strcmp(RecompileLib, "-n") != 0){
         ThrowException("Invalid RecompileLib Flag");
     }

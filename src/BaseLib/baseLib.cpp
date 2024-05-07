@@ -5,6 +5,14 @@ int abs(int x) {
     return x < 0 ? -x : x;
 }
 
+int max(int a, int b){
+    return a > b ? a : b;
+}
+
+int min(int a, int b){
+    return a < b ? a : b;
+}
+
 /// @brief Initialize the IO pins
 void Init(){
     AVR_Init();
@@ -82,4 +90,48 @@ void DrawRectangle(int x1, int y1, int x2, int y2, Color color){
 /// @return the state of the IO pins
 uint8_t ReadInputs(){
     return AVR_Read_Inputs();
+}
+
+/// @brief Write the output pins
+/// @param value input value for PORTB
+void WriteOutputs(uint8_t value){
+    AVR_Write_Outputs(value);
+}
+
+/// @brief Initialize the UART at 9600 baud
+void InitUART(int baudrate){
+    uint16_t baud = (16000000/16/baudrate) - 1;
+    AVR_Init_UART(baud);
+    
+}
+
+/// @brief Send a byte over UART
+/// @param data byte to send
+void printChar(char character){
+    AVR_Send_UART(character);
+}
+
+/// @brief Receive a byte over UART
+/// @return received byte
+uint8_t ReceiveUART(){
+    return AVR_Receive_UART();
+}
+
+/// @brief Delay for 1 second
+void Delay(){
+    AVR_Delay();
+}
+
+/// @brief Delay for 10ms
+void Delay10ms(){
+    AVR_Delay_10ms();
+}
+
+/// @brief Print a string to the UART
+/// @param str the string to print
+void print(char* str){
+    while(*str){
+        AVR_Send_UART(*str);
+        str++;
+    }
 }
