@@ -173,16 +173,16 @@ AVR_Init_UART:
 ;   input:
 ;	r24, Data
 ;   Using :
-;   r24
+;   r25
 
 .global AVR_Send_UART
 AVR_Send_UART:
-	lds		r25,UCSR0A			; load UCSR0A into r24
+	lds		r25,UCSR0A			; load UCSR0A into r25
 	sbrs	r25,UDRE0			; wait for empty transmit buffer
-	rjmp	AVR_Send_UART				; repeat loop
-	sts	UDR0,r24			; transmit character
+	rjmp	AVR_Send_UART		; repeat loop
+	sts	UDR0,r24				; transmit character
 
-	ret					; return from subroutine
+	ret							; return from subroutine
 
 
 ;***** AVR_Receive_UART *****
@@ -192,14 +192,53 @@ AVR_Send_UART:
 
 .global AVR_Receive_UART
 AVR_Receive_UART:	
-	lds		r24,UCSR0A			; load UCSR0A into r17
-	sbrs	r24,UDRE0		; wait for empty transmit buffer
-	rjmp	AVR_Receive_UART			; repeat loop
+	lds		r24,	UCSR0A			; load UCSR0A into r24
+	sbrs	r24,	UDRE0			; wait for empty transmit buffer
+	rjmp	AVR_Receive_UART		; repeat loop
 
-	lds	r24,UDR0			; get received character
+	lds		r24,	UDR0			; get received character
 
-	ret						; return from subroutine
+	ret								; return from subroutine
 
+;***** AVR_Receive_UART_String *****
+;   input:
+;   r25, String address H
+;   r24, String address L
+;   Using :
+;   r23
+
+.global AVR_Receive_UART_String
+AVR_Receive_UART_String:
+	mov XH, r25
+	mov XL, r24
+AVR_Receive_UART_String_loop:
+	lds		r25,	UCSR0A					; load UCSR0A into r17
+	sbrs	r25,	UDRE0					; wait for empty transmit buffer
+
+	rjmp	AVR_Receive_UART_String_loop	; repeat loop
+
+	lds 	r24, 	UDR0					; get received character
+	cpi		r24,	0x0A					; check if rcv'd char is NL
+
+	breq	AVR_Receive_UART_String_end		; branch if NL rcv'd
+
+	st		X+,		r24						; store character to buffer
+	call	AVR_Send_UART					; echo character
+	rjmp	AVR_Receive_UART_String_loop	; get another character
+
+
+AVR_Receive_UART_String_end:
+	ldi		r24,	0x0A					; load NL into r24
+	call	AVR_Send_UART					; echo NL
+	rjmp USART_Flush
+	ret					; return from subroutine
+
+USART_Flush:
+	lds		r24,	UCSR0A			; load UCSR0A into r24
+	sbrs	r24,	UDRE0			; wait for empty transmit buffer
+	ret
+	in r24, UDR0
+	rjmp USART_Flush
 
 ;***** AVR_Delay_10ms *****
 ;   input:
@@ -213,12 +252,13 @@ AVR_Receive_UART:
 
 .global AVR_Delay_10ms
 AVR_Delay_10ms:
-	ldi	iLoopRl,iValL	; intialize inner loop count in inner
-	ldi	iLoopRh,iValH	; loop high and low registers
-iLoop2:	sbiw	iLoopRl,1		; decrement inner loop registers
+	ldi	iLoopRl,	iValL	; intialize inner loop count in inner
+	ldi	iLoopRh,	iValH	; loop high and low registers
+iLoop2:	
+	sbiw	iLoopRl,	1	; decrement inner loop registers
 	brne	iLoop2			; branch to iLoop if iLoop registers != 0
-	nop				; no operation
-	ret				; return from subroutine
+	nop						; no operation
+	ret						; return from subroutine
 
 
 	;***** AVR_Delay *****
@@ -232,12 +272,59 @@ iLoop2:	sbiw	iLoopRl,1		; decrement inner loop registers
 AVR_Delay:
 	ldi loopCt, 0x7f
 	caca:
-	ldi	iLoopRl,iValL	; intialize inner loop count in inner
-	ldi	iLoopRh,iValH	; loop high and low registers
+	ldi	iLoopRl,iValL		; intialize inner loop count in inner
+	ldi	iLoopRh,iValH		; loop high and low registers
 
-iLoop:	sbiw	iLoopRl,1		; decrement inner loop registers
+iLoop:	
+	sbiw	iLoopRl,1		; decrement inner loop registers
 	brne	iLoop			; branch to iLoop if iLoop registers != 0
-	dec	loopCt			; decrement outer loop register
-	brne	caca		; branch to oLoop if outer loop register != 0
-	nop				; no operation
-	ret				; return from subroutine
+	dec		loopCt			; decrement outer loop register
+	brne	caca			; branch to oLoop if outer loop register != 0
+	nop						; no operation
+	ret						; return from subroutine
+
+;***** AVR_Read_Rom *****
+;   input:
+;   r25, AddressH
+;   r24, AddressL
+;   Output :
+;   r24, Data
+
+.global AVR_Read_Rom
+AVR_Read_Rom:
+
+	sbic _SFR_IO_ADDR(EECR),	EEWE		; Wait for completion of previous write
+	rjmp AVR_Read_Rom
+
+	out _SFR_IO_ADDR(EEARH), 	r25			; Set up address (r24:r25) in address register
+	out _SFR_IO_ADDR(EEARL), 	r24
+	sbi _SFR_IO_ADDR(EECR),		EERE		; Start eeprom read by writing EERE
+	
+	in r24,		_SFR_IO_ADDR(EEDR)						; Read data from data register
+
+	ret
+
+
+;***** AVR_Write_Rom *****
+;   input:
+;   r25, AddressH
+;   r24, AddressL
+;   r22, DataL
+.global AVR_Write_Rom
+AVR_Write_Rom:
+				
+	sbic _SFR_IO_ADDR(EECR),	EEWE		; Wait for completion of previous write
+	rjmp AVR_Write_Rom
+	out _SFR_IO_ADDR(EEARH), 	r25			; Set up address (r24:r25) in address register
+	out _SFR_IO_ADDR(EEARL), 	r24
+	out _SFR_IO_ADDR(EEDR),		r22			; Write data (r22) to data register
+	sbi _SFR_IO_ADDR(EECR),		EEMWE		; Write logical one to EEMWE
+	sbi _SFR_IO_ADDR(EECR),		EEWE 		; Start eeprom write by setting EEWE
+	ret
+
+.global AVR_DEBUG
+AVR_DEBUG:
+	ldi r24, 69
+	ldi r25, 0
+	ret
+

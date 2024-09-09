@@ -1,5 +1,7 @@
 #include "driver.h"
 #include "baseLib.h"
+#include "OS.h"
+#include "memory.h"
 
 int abs(int x) {
     return x < 0 ? -x : x;
@@ -102,7 +104,7 @@ void WriteOutputs(uint8_t value){
 void InitUART(int baudrate){
     uint16_t baud = (16000000/16/baudrate) - 1;
     AVR_Init_UART(baud);
-    
+    print("Initializing...\n");
 }
 
 /// @brief Send a byte over UART
@@ -113,8 +115,14 @@ void printChar(char character){
 
 /// @brief Receive a byte over UART
 /// @return received byte
-uint8_t ReceiveUART(){
+unsigned char ReceiveUART(){
     return AVR_Receive_UART();
+}
+
+const char * ReceiveUARTString(){
+    unsigned char * buffer = (unsigned char *)(malloc(256));
+    AVR_Receive_UART_String(buffer);
+    return (const char *)buffer;
 }
 
 /// @brief Delay for 1 second
@@ -129,9 +137,67 @@ void Delay10ms(){
 
 /// @brief Print a string to the UART
 /// @param str the string to print
-void print(char* str){
+void print(const char* str){
     while(*str){
         AVR_Send_UART(*str);
         str++;
     }
+}
+
+void println(const char* str){
+    print(str);
+    printChar('\n');
+}
+
+void print(int i){
+    print(itoa(i));
+}
+
+uint16_t DEBUG(){
+    return AVR_DEBUG();
+}
+
+const char * itoa(int i){
+    static char buffer[14];
+    int j = 0;
+    if(i < 0){
+        buffer[j] = '-';
+        j++;
+        i = -i;
+    }
+    if(i == 0){
+        buffer[j] = '0';
+        j++;
+    }
+    while(i){
+        buffer[j] = i % 10 + '0';
+        i /= 10;
+        j++;
+    }
+    buffer[j] = 0;
+    for(int k = 0; k < j/2; k++){
+        char temp = buffer[k];
+        buffer[k] = buffer[j - k - 1];
+        buffer[j - k - 1] = temp;
+    }
+    return buffer;
+}
+
+uint8_t ReadRom(uint16_t address){
+    return AVR_Read_Rom(address);
+}
+
+void WriteRom(uint16_t address, uint8_t data){
+    AVR_Write_Rom(address, data);
+}
+
+bool strcmp(const char* a, const char* b){
+    while(*a && *b){
+        if(*a != *b){
+            return false;
+        }
+        a++;
+        b++;
+    }
+    return *a == *b;
 }

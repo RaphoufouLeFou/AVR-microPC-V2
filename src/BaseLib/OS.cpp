@@ -16,3 +16,31 @@ void DrawChar(char c, uint8_t x, uint8_t y, Color color){
         }
     }
 }
+
+const char * ExceptionStrings[] = {
+    "Divide by zero",
+    "Invalid opcode",
+    "Stack fault",
+    "General protection fault",
+    "Argument error",
+    "Security",
+    "Overflow",
+    "Assertion",
+    "File",
+};
+
+void ThrowException(Exception e, int line, const char *file, const char* message, bool halt){
+    print("Exception: ");
+    print(ExceptionStrings[e]);
+    print(" at line ");
+    print(itoa(line));
+    print(" in file ");
+    print(file);
+    if (message){
+        print(" with message: \n");
+        print(message);
+    }
+    printChar('\n');
+    if (halt)
+        while(1);
+}

@@ -28,7 +28,7 @@ public:
     }
     uint16_t get16BitBGR(){
         //float r = this->r / b;
-        return 0x00FF;
+        return 0xFFFF;
         return ( this->b << 11) | ( this->g << 5) | ( this->r << 0);
     }
     uint8_t r;
@@ -49,10 +49,19 @@ uint8_t ReadInputs();
 void WriteOutputs(uint8_t data);
 void InitUART(int baudrate);
 void printChar(char character);
-uint8_t ReceiveUART();
+unsigned char ReceiveUART();
+const char * ReceiveUARTString();
 void Delay();
 void Delay10ms();
-void print(char* str);
+void print(const char* str);
+void println(const char* str);
+void print(int i);
+const char * itoa(int i);
+bool strcmp(const char* a, const char* b);
+uint8_t ReadRom(uint16_t address);
+void WriteRom(uint16_t address, uint8_t data);
+uint16_t DEBUG();
+
 
 
 #endif /* !BASELIB_H */
