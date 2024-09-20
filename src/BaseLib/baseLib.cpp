@@ -25,7 +25,10 @@ void Init(){
 /// @param AddressY Y coordinate of the pixel (0-127)
 /// @param Color 16-bit color value
 void DrawPoint(int x, int y, Color color){
-    AVR_Output_Pixel(color.get16BitBGR(), x, y);
+    AVR_Output_Pixel(color.get16BitBGR(), x*2, y);
+    AVR_Output_Pixel(color.get16BitBGR(), x*2, y);
+    AVR_Output_Pixel(color.get16BitBGR(), x*2+1, y);
+    AVR_Output_Pixel(color.get16BitBGR(), x*2+1, y);
 }
 
 /// @brief Output a pixel to the screen at the given address with the given color
@@ -33,7 +36,10 @@ void DrawPoint(int x, int y, Color color){
 /// @param AddressY Y coordinate of the pixel (0-127)
 /// @param Color 16-bit color value 
 void DrawPoint(uint8_t x, uint8_t y, Color color){
-    AVR_Output_Pixel(color.get16BitBGR(), x, y);
+    AVR_Output_Pixel(color.get16BitBGR(), x*2, y);
+    AVR_Output_Pixel(color.get16BitBGR(), x*2, y);
+    AVR_Output_Pixel(color.get16BitBGR(), x*2+1, y);
+    AVR_Output_Pixel(color.get16BitBGR(), x*2+1, y);
 }
 
 /// @brief Fill the screen with the given color

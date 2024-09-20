@@ -18,10 +18,10 @@ AVR_Init:
 
 	clr		XH							;
 	ldi		XL,		0x64				;
-	ldi		r25, 	0b00010000
+	ldi		r25, 	0b00000000
 	st		X, 	r25						;
 	ldi		XL,		0x61				;
-    ldi     r25,   	0xFC				;
+    ldi     r25,   	0xFF				;
 	st     	X,		r25					;
 	ret
 
@@ -42,24 +42,33 @@ AVR_Output_Pixel:                      	;output the pixel to the screen
 	ldi		XL,		0x63				;
 	clr		XH
 AVR_Output_Pixel_Loop:
-	;ld		tmp, 	X
-	;sbrs    tmp,   4	    			
-	;rjmp    AVR_Output_Pixel_Loop	
-		
+	ld		tmp, 	X
+	sbrs    tmp,   4	    			
+	rjmp    AVR_Output_Pixel_Loop	
+				
+	ldi 	tmp,		0xFF
+	ldi		XL,		0x61				
+	st     	X,		tmp					
+
 	ldi		XL,		0x62					
-	st     	X,		r24					
+	st     	X,		r24			
+	out     _SFR_IO_ADDR(DDRA),  tmp
     out     _SFR_IO_ADDR(PORTA),  r25	
 	out     _SFR_IO_ADDR(PORTC),  r22   
     out     _SFR_IO_ADDR(PORTD),  r20   
 	sbi     _SFR_IO_ADDR(PORTD),  7  	;
+	nop
     cbi     _SFR_IO_ADDR(PORTD),  7     
     clr     r20
 	st     	X,		r20					;Clear the ports
 	out     _SFR_IO_ADDR(PORTA),  r20   ;
+	out		_SFR_IO_ADDR(DDRA),   r20   ;
+	ldi		XL,		0x61				
+	st     	X,		r20		
 	out     _SFR_IO_ADDR(PORTD),  r20   ;
 	out     _SFR_IO_ADDR(PORTC),  r20   ;
     ret
-
+	#undef   tmp
 
 ;***** AVR_Output_All *****
 ;   input:
@@ -110,11 +119,16 @@ outputAllEndLoop:
     inc     AdY				    		;increase the Y address
 	rjmp    outputAllLoop       		;jump to the outputAllLoop loop
 outputAllEnd: 
+
     clr     r20
 	st     	X,		r20					;Clear the ports
 	out     _SFR_IO_ADDR(PORTA),  r20   ;
 	out     _SFR_IO_ADDR(PORTD),  r20   ;
 	out     _SFR_IO_ADDR(PORTC),  r20   ;
+	out		_SFR_IO_ADDR(DDRA),   r20   ;
+	ldi		XL,		0x61				
+	st     	X,		r20		
+
     ret
 
 
@@ -324,7 +338,14 @@ AVR_Write_Rom:
 
 .global AVR_DEBUG
 AVR_DEBUG:
-	ldi r24, 69
-	ldi r25, 0
+	ldi r25,    			0xFF	;
+	out _SFR_IO_ADDR(DDRE), r25		;
+	out _SFR_IO_ADDR(PORTE),res		;write E
+	clr		XH							;
+	ldi		XL,		0x64				;
+	ldi		r25, 	0b00001111
+	st		X, 	r25						;
+	ldi		XL,		0x65				;
+	ldi     r25,   	0xFF				;
+	st     	X,		r25					;
 	ret
-

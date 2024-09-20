@@ -22,5 +22,6 @@ enum Exception {
 void ThrowException(Exception e, int line, const char *file, const char* message, bool halt);
 void PrintText(const char *text, uint8_t x, uint8_t y, Color color);
 void DrawChar(char c, uint8_t x, uint8_t y, Color color);
+void DrawCharOtherSens(char c, uint8_t x, uint8_t y, Color color);
 
 #endif

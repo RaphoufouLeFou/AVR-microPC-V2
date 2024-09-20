@@ -8,9 +8,6 @@ int main(){
     Init();
     InitUART(9600);
 
-    DrawPoint(10, 10, Color(1, 1, 1));
-    FillScreen(Color(0, 1, 0));
-
     File f;
     CreateFile("test", 12, &f);
     //WriteFile(&f, 0, 12, (uint8_t *) "Hello World");
@@ -19,7 +16,7 @@ int main(){
     println((const char*)buffer);
 
     uint8_t * mem = static_cast<uint8_t*>(malloc(12));
-    memcpy(mem, (void *)"Hello World", 12);
+    memcpy(mem, (void *)"lololololol", 12);
     print((const char*)mem);
 
     print("\n\n");
@@ -57,16 +54,30 @@ int main(){
 
     print("\n");
 
-    print(itoa(list.length()));
+    print(list.length());
 
+
+    //WriteOutputs(0xFF);
+    //DEBUG();
+
+    for(int i = 0; i < 256; i++){
+        for (int j = 0; j < 128; j++){
+            DrawPoint(i, j, Color(0, 0, 1));
+        }
+    }
+
+
+    PrintText("Quoi?", 10, 10, Color(1, 1, 1));
+    PrintText("Feur", 10, 20, Color(1, 1, 1));
+
+    print("Testing OS\n");
     while(1){
-        const char * str = ReceiveUARTString();
-        if(!!*str) print(str);
-        free((void*)str);
+        //DrawPoint(10, 10, Color(1, 1, 1));
+        //FillScreen(Color(0, 1, 0));
     }
     
     //DrawPoint(10, 10, Color(1, 1, 1));
-    //WriteOutputs(0xFF);
+
     //DrawLine(0, 0, 255, 127, Color(1, 1, 1));
     //FillScreen(Color(0, 1, 0));
     //PrintText("Hello World!", 10, 10, Color(1, 1, 1));

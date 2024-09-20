@@ -4,4 +4,5 @@
 ::C:\Users\rapha\AppData\Local\Arduino15\packages\MegaCore\tools\avrdude\7.2-arduino.1/bin/avrdude  -CC:\Users\rapha\AppData\Local\Arduino15\packages\MegaCore\hardware\avr\3.0.1/avrdude.conf  -v -patmega128  -curclock -PCOM1 -b115200 -D -Uflash:w:D:\DOCUMENTS\GitHub\AVR-dev\arduinoCppCode\image.hex:i
 
 
-C:\Users\rapha\AppData\Local\Arduino15\packages\MegaCore\tools\avrdude\7.2-arduino.1/bin/avrdude -CC:\Users\rapha\AppData\Local\Arduino15\packages\MegaCore\hardware\avr\3.0.1/avrdude.conf -v -patmega128a -curclock -PCOM1 -b115200 -D -Uflash:w:D:\DOCUMENTS\GitHub\AVR-microPC-V2\src\image.hex
+:: C:\Users\rapha\AppData\Local\Arduino15\packages\MegaCore\tools\avrdude\7.2-arduino.1/bin/avrdude -CC:\Users\rapha\AppData\Local\Arduino15\packages\MegaCore\hardware\avr\3.0.1/avrdude.conf -v -patmega128a -curclock -PCOM1 -b115200 -D -Uflash:w:D:\DOCUMENTS\GitHub\AVR-microPC-V2\src\image.hex
+"C:\Program Files (x86)\Atmel\avrdude.exe" -C"C:\Program Files (x86)\Atmel\avrdude.conf" -v -patmega128a -curclock -PCOM14 -b115200 -D -Uflash:w:image.hex

@@ -13,9 +13,9 @@ public:
         b = 0;
     }
     Color(float r = 0, float g = 0, float b = 0){
-        if(r < 1.0) r = 1.0;
-        if(g < 1.0) g = 1.0;
-        if(b < 1.0) b = 1.0;
+        if(r > 1.0) r = 1.0;
+        if(g > 1.0) g = 1.0;
+        if(b > 1.0) b = 1.0;
 
         this->r = (int)(r*0b11111);
         this->g = (int)(g*0b111111);
@@ -28,7 +28,6 @@ public:
     }
     uint16_t get16BitBGR(){
         //float r = this->r / b;
-        return 0xFFFF;
         return ( this->b << 11) | ( this->g << 5) | ( this->r << 0);
     }
     uint8_t r;
