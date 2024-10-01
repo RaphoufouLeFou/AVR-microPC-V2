@@ -1,7 +1,16 @@
 #include "driver.h"
 #include "baseLib.h"
 #include "OS.h"
+#include "list.h"
 #include "memory.h"
+
+void AVR_INT7(){
+    print("INT7\n");
+}
+
+ISR(INT7_vect){
+    AVR_INT7();
+}
 
 int abs(int x) {
     return x < 0 ? -x : x;
@@ -18,6 +27,16 @@ int min(int a, int b){
 /// @brief Initialize the IO pins
 void Init(){
     AVR_Init();
+    DDRE &=~_BV(7); 		//INT0 en entrée 
+	PORTE |= _BV(7); 		//Active la résistance de tirage sur l'entrée INT7
+ 
+	EIMSK |= _BV(INT7);		//Interruption sur INT7
+ 
+	EICRB |= 0b11000000;	//Interruption sur front  descendant donc dans le registre MCUCR ISC01 = 1 ISC00 =0
+					        //Vu que MCUCR à comme valeur par defaut 0 on a juste à mettre ISC01 à 1 Cf : datasheet
+ 
+ 	sei();				//Active les interruptions
+ 
 }
 
 /// @brief Output a pixel to the screen at the given address with the given color
@@ -29,6 +48,18 @@ void DrawPoint(int x, int y, Color color){
     AVR_Output_Pixel(color.get16BitBGR(), x*2, y);
     AVR_Output_Pixel(color.get16BitBGR(), x*2+1, y);
     AVR_Output_Pixel(color.get16BitBGR(), x*2+1, y);
+}
+
+typedef struct {
+    uint8_t x;
+    uint8_t y;
+    uint16_t color;
+} Point;
+
+List<Point> points;
+
+void PlotPixel(int x, int y, Color color){
+    points.push_back({x, y, color.get16BitBGR()});
 }
 
 /// @brief Output a pixel to the screen at the given address with the given color

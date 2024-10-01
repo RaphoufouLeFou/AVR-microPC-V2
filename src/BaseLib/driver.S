@@ -25,6 +25,7 @@ AVR_Init:
 	st     	X,		r25					;
 	ret
 
+.global AVR_Plot_Pixel
 
 
 ;***** AVR_Output_Pixel *****

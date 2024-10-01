@@ -3,113 +3,149 @@
 
 #define MEMORY_SIZE 4096
 
-struct memoryBlock {
-    uint16_t size;
-    memoryBlock * next;
-    memoryBlock * prev;
+#include <avr/io.h>
 
-    memoryBlock(){
-        size = 0;
-        next = 0;
-        prev = 0;
-    }
-
-    
+struct __freelist {
+	uint16_t sz;
+	struct __freelist *nx;
 };
 
-int blockCount = 0;
+extern char __heap_start;
+extern char __heap_end;
+#define STACK_POINTER() ((char *)AVR_STACK_POINTER_REG)
 
-uint16_t address(memoryBlock * block){ 
-    return (uint16_t)((uint16_t)block + (uint16_t)sizeof(memoryBlock)); 
+uint16_t __malloc_margin = 32;
+char *__malloc_heap_start = &__heap_start;
+char *__malloc_heap_end = &__heap_end;
+
+char *__brkval;
+struct __freelist *__flp;
+
+void * malloc(uint16_t len)
+{
+	struct __freelist *fp1, *fp2, *sfp1, *sfp2;
+	char *cp;
+	uint16_t s, avail;
+	
+	if (len < sizeof(struct __freelist) - sizeof(uint16_t))
+		len = sizeof(struct __freelist) - sizeof(uint16_t);
+
+	for (s = 0, fp1 = __flp, fp2 = 0;
+	     fp1;
+	     fp2 = fp1, fp1 = fp1->nx) {
+		if (fp1->sz < len)
+			continue;
+		if (fp1->sz == len) {
+
+			if (fp2)
+				fp2->nx = fp1->nx;
+			else
+				__flp = fp1->nx;
+			return &(fp1->nx);
+		}
+		else {
+			if (s == 0 || fp1->sz < s) {
+				
+				s = fp1->sz;
+				sfp1 = fp1;
+				sfp2 = fp2;
+			}
+		}
+	}
+
+	if (s) {
+		if (s - len < sizeof(struct __freelist)) {
+			
+			if (sfp2)
+				sfp2->nx = sfp1->nx;
+			else
+				__flp = sfp1->nx;
+			return &(sfp1->nx);
+		}
+
+		cp = (char *)sfp1;
+		s -= len;
+		cp += s;
+		sfp2 = (struct __freelist *)cp;
+		sfp2->sz = len;
+		sfp1->sz = s - sizeof(uint16_t);
+		return &(sfp2->nx);
+	}
+
+	if (__brkval == 0)
+		__brkval = __malloc_heap_start;
+	cp = __malloc_heap_end;
+	if (cp == 0)
+		cp = STACK_POINTER() - __malloc_margin;
+	if (cp <= __brkval)
+
+	  return 0;
+	avail = cp - __brkval;
+
+	if (avail >= len && avail >= len + sizeof(uint16_t)) {
+		fp1 = (struct __freelist *)__brkval;
+		__brkval += len + sizeof(uint16_t);
+		fp1->sz = len;
+		return &(fp1->nx);
+	}
+	return 0;
 }
 
-int freeMemory = 0;
+void free(void *p)
+{
+	struct __freelist *fp1, *fp2, *fpnew;
+	char *cp1, *cp2, *cpnew;
 
-// TODO :
-// MemoryBlocks are at the start of a block in memory
-// Remove address from struct
+	if (p == 0)
+		return;
 
-memoryBlock * firstBlock = 0;
-memoryBlock * lastBlock = 0;
+	cpnew = (char*)p;
+	cpnew -= sizeof(uint16_t);
+	fpnew = (struct __freelist *)cpnew;
+	fpnew->nx = 0;
 
-uint16_t getFreeRam() {
-  extern int __heap_start, *__brkval; 
-  int v; 
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
-}
+	if (__flp == 0) {
+		if ((char *)p + fpnew->sz == __brkval)
+			__brkval = cpnew;
+		else
+			__flp = fpnew;
+		return;
+	}
 
-void * malloc(uint16_t size){
-    if(size == 0) return NULL;
-    if(!firstBlock) {
-        uint16_t freeRam = getFreeRam();                    
-        if(freeRam < size) return NULL;                     
-        firstBlock = (memoryBlock *)(MEMORY_SIZE - freeRam);     
-        firstBlock->size = size;                            
-        firstBlock->next = 0;                               
-        firstBlock->prev = 0;                               
-        lastBlock = firstBlock;      
-        freeMemory = freeRam - size;              
-        blockCount++;          
-        print(" 1-- Allocating memory at address: ");
-        println(itoa((int)address(firstBlock)));
-        print("Block count: "); 
-        println(itoa(blockCount));
-        return (void *)(address(firstBlock));               
-    }
-    memoryBlock * block = firstBlock;
-    while(block){
-        if(block->next){
-            if(address(block->next) - (address(block) + block->size) >= size){
-                memoryBlock * newBlock = (memoryBlock *)(address(block) + block->size);
-                newBlock->size = size;
-                newBlock->next = block->next;
-                newBlock->prev = block;
-                block->next->prev = newBlock;
-                block->next = newBlock;
-                freeMemory -= size;
-                blockCount++;
-                print(" 2 --- Allocating memory at address: ");
-                println(itoa((int)address(newBlock)));
-                print("Block count: "); 
-                println(itoa(blockCount));
-                return (void *)address(newBlock);
-            }
-        } else {
-            if(MEMORY_SIZE - (address(block) + block->size) >= size){
-                memoryBlock * newBlock = (memoryBlock *)(address(block) + block->size);
-                newBlock->size = size;
-                newBlock->next = 0;
-                newBlock->prev = block;
-                block->next = newBlock;
-                lastBlock = newBlock;
-                freeMemory -= size;
-                blockCount++;
-                print(" 3 - --- Allocating memory at address: ");
-                println(itoa((int)address(newBlock)));
-                print("Block count: "); 
-                println(itoa(blockCount));
-                return (void *)address(newBlock);
-            }
-        }
-        block = block->next;
-    }
-    return NULL;
-}
-
-void free(void * ptr){
-    if(!ptr) ThrowException(EXCEPTION_ARGUMENT_ERROR, __LINE__, __FILE__, "trying to free a null pointer", 0);
-    memoryBlock * block = firstBlock;
-    while(block){
-        if(address(block) == (uint16_t)ptr){
-            if(block->prev) block->prev->next = block->next;
-            if(block->next) block->next->prev = block->prev;
-            if(block == firstBlock) firstBlock = block->next;
-            if(block == lastBlock) lastBlock = block->prev;
-            blockCount--;
-            return;
-        }
-        block = block->next;
-    }
+	for (fp1 = __flp, fp2 = 0;
+	     fp1;
+	     fp2 = fp1, fp1 = fp1->nx) {
+		if (fp1 < fpnew)
+			continue;
+		cp1 = (char *)fp1;
+		fpnew->nx = fp1;
+		if ((char *)&(fpnew->nx) + fpnew->sz == cp1) {
+			fpnew->sz += fp1->sz + sizeof(uint16_t);
+			fpnew->nx = fp1->nx;
+		}
+		if (fp2 == 0) {
+			__flp = fpnew;
+			return;
+		}
+		break;
+	}
+	fp2->nx = fpnew;
+	cp2 = (char *)&(fp2->nx);
+	if (cp2 + fp2->sz == cpnew) {
+		fp2->sz += fpnew->sz + sizeof(uint16_t);
+		fp2->nx = fpnew->nx;
+	}
+	for (fp1 = __flp, fp2 = 0;
+	     fp1->nx != 0;
+	     fp2 = fp1, fp1 = fp1->nx);
+	cp2 = (char *)&(fp1->nx);
+	if (cp2 + fp1->sz == __brkval) {
+		if (fp2 == NULL)
+			__flp = NULL;
+		else
+			fp2->nx = NULL;
+		__brkval = cp2 - sizeof(uint16_t);
+	}
 }
 
 void memset(void * ptr, uint8_t value, uint16_t size){

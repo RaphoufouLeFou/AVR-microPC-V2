@@ -1,5 +1,10 @@
 {
     "files.associations": {
-        "cstdint": "cpp"
-    }
+        "cstdint": "cpp",
+        "cstddef": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp"
+    },
 }
