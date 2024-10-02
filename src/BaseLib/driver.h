@@ -5,6 +5,8 @@ extern "C" {
     /// @brief Initialize the IO pins 
     extern void AVR_Init(void);
 
+    extern uint8_t AVR_Plot_Pixel(uint16_t Color, uint8_t AddressX, uint8_t AddressY);
+
     /// @brief Output a pixel to the screen at the given address with the given color
     /// @param Color 16-bit color value (5 bits blue, 6 bits green, 5 bits red)
     /// @param AddressX X coordinate of the pixel (0-255)
