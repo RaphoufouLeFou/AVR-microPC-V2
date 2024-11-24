@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef BASELIB_H
 #define BASELIB_H
 

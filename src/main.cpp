@@ -4,13 +4,16 @@
 #include "BaseLib/memory.h"
 #include "BaseLib/list.h"
 
-int main(){
+int main()
+{
     Init();
     InitUART(9600);
 
+    print("Hello World!\n");
+
     File f;
     CreateFile("test", 12, &f);
-    //WriteFile(&f, 0, 12, (uint8_t *) "Hello World");
+    // WriteFile(&f, 0, 12, (uint8_t *) "Hello World");
     uint8_t * buffer = static_cast<uint8_t*>(malloc(12));
     ReadFile(&f, 0, 12, buffer);
     println((const char*)buffer);
@@ -59,13 +62,13 @@ int main(){
 
     //WriteOutputs(0xFF);
     //DEBUG();
-
+/*
     for(int i = 0; i < 256; i++){
         for (int j = 0; j < 128; j++){
             DrawPoint(i, j, Color(0, 0, 1));
         }
     }
-
+*/
 
     PrintText("Quoi?", 10, 10, Color(1, 1, 1));
     PrintText("Feur", 10, 20, Color(1, 1, 1));

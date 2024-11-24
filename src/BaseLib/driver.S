@@ -350,7 +350,7 @@ iLoop:
 
 .global AVR_Read_Rom
 AVR_Read_Rom:
-	cei									; Disable interrupt before writing to the EEPROM
+	cli									; Disable interrupt before writing to the EEPROM
 	sbic 	IO(EECR),	EEWE			; Wait for completion of previous write
 	rjmp 	AVR_Read_Rom
 
@@ -370,7 +370,7 @@ AVR_Read_Rom:
 ;   r22, DataL
 .global AVR_Write_Rom
 AVR_Write_Rom:
-	cei									; Disable interrupt before writing to the EEPROM
+	cli									; Disable interrupt before writing to the EEPROM
 	sbic 	IO(EECR),	EEWE			; Wait for completion of previous write
 	rjmp 	AVR_Write_Rom
 	out 	IO(EEARH), 	r25				; Set up address (r24:r25) in address register

@@ -13,7 +13,6 @@ typedef struct {
 Queue<Point> points;
 
 void AVR_INT7(){
-    print("INT7\n");
     uint8_t val = 0;
     while(!val){
         if(points.length() == 0){
@@ -26,6 +25,7 @@ void AVR_INT7(){
             points.pop();
         }
     }
+    asm("cli");
 }
 
 ISR(INT7_vect){
@@ -52,7 +52,7 @@ void Init(){
  
 	EIMSK |= _BV(INT7);		//Interruption sur INT7
  
-	EICRB |= 0b11000000;	//Interruption sur front  descendant donc dans le registre MCUCR ISC01 = 1 ISC00 =0
+	EICRB |= 0b10000000;	//Interruption sur front  descendant donc dans le registre MCUCR ISC01 = 1 ISC00 =0
 					        //Vu que MCUCR à comme valeur par defaut 0 on a juste à mettre ISC01 à 1 Cf : datasheet
  
  	//sei();				//Active les interruptions
@@ -60,8 +60,17 @@ void Init(){
 }
 
 void PlotPixel(int x, int y, Color color){
-    points.push(Point{x, y, color.get16BitBGR()});
-    sei();
+    //points.push(Point{x, y, color.get16BitBGR()});
+    //points.push(Point{x, y, color.get16BitBGR()});
+    print("Plotting pixel at x: ");
+    print(x);
+    print(" y: ");
+    print(y);
+    print("\n");
+    //cli();
+    //println(itoa(points.length()));
+    //sei();
+    AVR_Output_Pixel(color.get16BitBGR(), x, y);
 }
 
 /// @brief Output a pixel to the screen at the given address with the given color
@@ -69,13 +78,14 @@ void PlotPixel(int x, int y, Color color){
 /// @param AddressY Y coordinate of the pixel (0-127)
 /// @param Color 16-bit color value
 void DrawPoint(int x, int y, Color color){
-    /*
-    AVR_Output_Pixel(color.get16BitBGR(), x*2, y);
-    AVR_Output_Pixel(color.get16BitBGR(), x*2, y);
-    AVR_Output_Pixel(color.get16BitBGR(), x*2+1, y);
-    AVR_Output_Pixel(color.get16BitBGR(), x*2+1, y);
-    */
+    
+    //AVR_Output_Pixel(color.get16BitBGR(), x*2, y);
+    //AVR_Output_Pixel(color.get16BitBGR(), x*2, y);
+    //AVR_Output_Pixel(color.get16BitBGR(), x*2+1, y);
+    //AVR_Output_Pixel(color.get16BitBGR(), x*2+1, y);
+    
     PlotPixel(x, y, color);
+   // PlotPixel(x, y, color);
 }
 
 
