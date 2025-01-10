@@ -168,7 +168,7 @@ void WriteOutputs(uint8_t value){
 
 /// @brief Initialize the UART at 9600 baud
 void InitUART(int baudrate){
-    uint16_t baud = (16000000/16/baudrate) - 1;
+    uint16_t baud = (20000000/16/baudrate) - 1;
     AVR_Init_UART(baud);
     print("Initializing...\n");
 }
