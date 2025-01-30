@@ -2,7 +2,7 @@
 #include "BaseLib/OS.h"
 #include "BaseLib/FileSystem.h"
 #include "BaseLib/memory.h"
-#include "BaseLib/list.h"
+//#include "BaseLib/list.h"
 #include "RayTracing.h"
 
 #include <stdlib.h>
@@ -560,7 +560,7 @@ ObjPair getDist(Vec3 pos) {
     
     float d2 = -1;
     
-    Obj* _o = nullptr;
+    Obj* _o = NULL;
     for(int32_t i = 0; i < sizeof(obj) / sizeof(obj[0]); i++) {
         Obj* o = obj[i];
         float d = o->dist(pos);
@@ -576,7 +576,7 @@ Vec3 ray(Vec3 pos, Vec3 mov, int32_t n) {
     float prevd = 0.000001; // small positive value to avoid division by zero
     if (n < 0) return BLACK;
     float dist = 0;
-    Obj* o = nullptr;
+    Obj* o = NULL;
     
     while (true) {
         

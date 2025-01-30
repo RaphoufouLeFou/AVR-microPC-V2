@@ -2,7 +2,8 @@
 #include "BaseLib/OS.h"
 #include "BaseLib/FileSystem.h"
 #include "BaseLib/memory.h"
-#include "BaseLib/list.h"
+//#include "BaseLib/list.h"
+#include "RayTracing.h"
 
 int main()
 {
@@ -10,7 +11,9 @@ int main()
     InitUART(9600);
 
     print("Hello World!\n");
-
+    RayMain();
+    while(1);
+/*
     File f;
     CreateFile("test", 12, &f);
     // WriteFile(&f, 0, 12, (uint8_t *) "Hello World");
@@ -58,7 +61,7 @@ int main()
     print("\n");
 
     print(list.length());
-
+*/
 
     //WriteOutputs(0xFF);
     //DEBUG();

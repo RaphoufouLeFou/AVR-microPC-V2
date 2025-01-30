@@ -33,7 +33,7 @@ public:
     uint8_t b;
 };
 
-int abs(int x);
+//int abs(int x);
 int max(int a, int b);
 int min(int a, int b);
 void Init();

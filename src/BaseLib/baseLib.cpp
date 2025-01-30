@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "baseLib.h"
 #include "OS.h"
-#include "list.h"
+//#include "list.h"
 #include "memory.h"
 
 typedef struct {
@@ -9,7 +9,7 @@ typedef struct {
     uint8_t y;
     uint16_t color;
 } Point;
-
+/*
 Queue<Point> points;
 
 void AVR_INT7(){
@@ -31,7 +31,7 @@ void AVR_INT7(){
 ISR(INT7_vect){
     AVR_INT7();
 }
-
+*/
 int abs(int x) {
     return x < 0 ? -x : x;
 }
@@ -186,7 +186,7 @@ unsigned char ReceiveUART(){
 }
 
 const char * ReceiveUARTString(){
-    unsigned char * buffer = (unsigned char *)(malloc(256));
+    unsigned char buffer[256];
     AVR_Receive_UART_String(buffer);
     return (const char *)buffer;
 }

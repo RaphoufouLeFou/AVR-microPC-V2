@@ -20,7 +20,7 @@ char *__malloc_heap_end = &__heap_end;
 
 char *__brkval;
 struct __freelist *__flp;
-
+/*
 void * malloc(uint16_t len)
 {
 	struct __freelist *fp1, *fp2, *sfp1, *sfp2;
@@ -147,7 +147,7 @@ void free(void *p)
 		__brkval = cp2 - sizeof(uint16_t);
 	}
 }
-
+*/
 void memset(void * ptr, uint8_t value, uint16_t size){
     if(!ptr) ThrowException(EXCEPTION_ARGUMENT_ERROR, __LINE__, __FILE__, "ptr is null", 0);
     uint8_t * p = (uint8_t *)ptr;
